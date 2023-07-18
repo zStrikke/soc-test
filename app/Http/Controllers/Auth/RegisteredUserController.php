@@ -22,20 +22,25 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'surname' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
+            'type' => ['required', 'in:' .  config('constants.personnel.types.JOURNALIST') 
+                                    .','.   config('constants.personnel.types.PARTICIPANT')],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
         $user = User::create([
             'name' => $request->name,
+            'surname' => $request->surname,
             'email' => $request->email,
+            'type' => $request->type,
             'password' => Hash::make($request->password),
         ]);
 
         event(new Registered($user));
 
-        Auth::login($user);
+        //Auth::login($user);
 
-        return response()->noContent();
+        return response('You have been succesfully registered', 201);
     }
 }
